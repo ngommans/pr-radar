@@ -1,6 +1,8 @@
 {
   "name": "pr-radar",
-  "version": "1.0.0",
+  "version": "0.0.0",
+
+
   "description": "Detect file-level collisions across open pull requests — local CLI",
   "type": "module",
   "bin": {

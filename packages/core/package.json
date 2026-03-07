@@ -1,6 +1,8 @@
 {
   "name": "pr-radar-core",
-  "version": "1.0.0",
+  "version": "0.0.0",
+
+
   "description": "Shared detection engine for PR Radar — detect file-level collisions across open pull requests",
   "type": "module",
   "main": "src/index.js",
