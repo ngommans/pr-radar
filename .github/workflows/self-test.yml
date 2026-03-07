@@ -21,8 +21,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 'lts/*'
           cache: 'npm'
+
+      - name: Check latest npm version
+        run: |
+          LATEST=$(npm show npm version)
+          CURRENT=$(npm --version)
+          echo "Current npm: $CURRENT | Latest npm: $LATEST"
+          npm install -g npm@latest
 
       - name: Install dependencies
         run: npm ci
@@ -42,8 +49,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 'lts/*'
           cache: 'npm'
+
+      - name: Check latest npm version
+        run: |
+          LATEST=$(npm show npm version)
+          CURRENT=$(npm --version)
+          echo "Current npm: $CURRENT | Latest npm: $LATEST"
+          npm install -g npm@latest
 
       - name: Install dependencies
         run: npm ci
@@ -70,8 +84,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 'lts/*'
           cache: 'npm'
+
+      - name: Check latest npm version
+        run: |
+          LATEST=$(npm show npm version)
+          CURRENT=$(npm --version)
+          echo "Current npm: $CURRENT | Latest npm: $LATEST"
+          npm install -g npm@latest
 
       - name: Install dependencies
         run: npm ci
@@ -96,8 +117,16 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 'lts/*'
           cache: 'npm'
+
+      - name: Check latest npm version
+        run: |
+          $LATEST = npm show npm version
+          $CURRENT = npm --version
+          Write-Host "Current npm: $CURRENT | Latest npm: $LATEST"
+          npm install -g npm@latest
+        shell: pwsh
 
       - name: Install dependencies
         run: npm ci

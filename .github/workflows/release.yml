@@ -20,9 +20,16 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 'lts/*'
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
+
+      - name: Check latest npm version
+        run: |
+          LATEST=$(npm show npm version)
+          CURRENT=$(npm --version)
+          echo "Current npm: $CURRENT | Latest npm: $LATEST"
+          npm install -g npm@latest
 
       - name: Install dependencies
         run: npm ci
