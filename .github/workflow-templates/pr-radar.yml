@@ -1,0 +1,40 @@
+name: PR Radar
+
+# Detect file-level collisions across open pull requests.
+# Docs: https://github.com/ngommans/pr-radar
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  pull-requests: write  # post/update collision comments
+  checks: write         # create check runs
+  contents: read
+
+jobs:
+  collision-check:
+    name: PR Radar — Collision Check
+    runs-on: ubuntu-latest
+    if: github.event.action != 'closed'
+    steps:
+      - uses: ngommans/pr-radar@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # Comma-separated glob patterns to exclude from collision detection.
+          # Lock files and generated files are good candidates.
+          # ignore-patterns: "*.lock,*.snap,*.generated.ts"
+
+          # Restrict detection to specific directory trees (faster on large repos).
+          # paths: "src/,packages/"
+
+  collision-clear:
+    name: PR Radar — Clear on Close
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed'
+    steps:
+      - uses: ngommans/pr-radar@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          # Keep ignore-patterns/paths in sync with the collision-check job above.
+          # ignore-patterns: "*.lock,*.snap,*.generated.ts"
+          # paths: "src/,packages/"

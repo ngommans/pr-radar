@@ -1,0 +1,35 @@
+{
+  "name": "pr-radar-root",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Monorepo root for PR Radar — detect file-level collisions across open pull requests",
+  "workspaces": [
+    "packages/core",
+    "packages/action",
+    "packages/cli"
+  ],
+  "scripts": {
+    "test": "npm run test --workspaces",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present"
+  },
+  "keywords": [
+    "pull-request",
+    "collision",
+    "github-action",
+    "merge-conflict",
+    "cli"
+  ],
+  "author": "DayCopilot Ltd",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ngommans/pr-radar.git"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

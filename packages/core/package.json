@@ -1,0 +1,44 @@
+{
+  "name": "pr-radar-core",
+  "version": "0.1.0",
+  "description": "Shared detection engine for PR Radar — detect file-level collisions across open pull requests",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./detector": "./src/detector.js",
+    "./comment": "./src/comment.js",
+    "./github-api": "./src/github-api.js",
+    "./diff": "./src/diff.js"
+  },
+  "scripts": {
+    "test": "node --experimental-vm-modules ../../node_modules/.bin/jest"
+  },
+  "keywords": [
+    "pull-request",
+    "collision",
+    "merge-conflict",
+    "github"
+  ],
+  "author": "DayCopilot Ltd",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ngommans/pr-radar.git",
+    "directory": "packages/core"
+  },
+  "dependencies": {
+    "minimatch": "^9.0.4"
+  },
+  "peerDependencies": {
+    "@octokit/core": "^6.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@octokit/core": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

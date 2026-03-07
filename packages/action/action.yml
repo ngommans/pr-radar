@@ -1,0 +1,63 @@
+name: PR Radar
+description: Detect file-level collisions across open pull requests
+author: DayCopilot Ltd
+
+inputs:
+  token:
+    description: >
+      GitHub token with pull-requests:write and checks:write (or statuses:write).
+      Defaults to the automatically provided GITHUB_TOKEN.
+    required: true
+    default: ${{ github.token }}
+
+  ignore-patterns:
+    description: >
+      Comma-separated glob patterns to exclude from collision detection.
+      Example: "package-lock.json,*.generated.ts,dist/"
+    required: false
+    default: ""
+
+  auto-ignore:
+    description: >
+      Comma-separated list of ignore files to auto-discover and layer.
+      Options: gitignore, npmignore, prettierignore, eslintignore
+      Default: gitignore (plus .prradarignore if present, always)
+    required: false
+    default: "gitignore"
+
+  paths:
+    description: >
+      Comma-separated glob patterns to scope collision detection to specific paths.
+      Useful for monorepos. Example: "packages/api/,shared/**"
+    required: false
+    default: ""
+
+  check-mode:
+    description: >
+      auto (default) | check-run | commit-status
+      auto tries check-run first, falls back to commit-status if checks:write is unavailable.
+    required: false
+    default: auto
+
+  comment-mode:
+    description: >
+      upsert (default) | off
+      upsert creates or updates a single managed comment per PR.
+      off disables PR comments entirely (check run only).
+    required: false
+    default: upsert
+
+  skip-drafts:
+    description: >
+      false (default) — set to true to exclude draft PRs from collision detection.
+      Draft PRs are included by default as they represent in-flight work.
+    required: false
+    default: "false"
+
+runs:
+  using: node20
+  main: dist/index.js
+
+branding:
+  icon: radio
+  color: orange
