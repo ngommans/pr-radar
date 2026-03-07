@@ -1,0 +1,7 @@
+{
+  "name": "PR Radar",
+  "description": "Detect file-level collisions across open pull requests and warn before merge.",
+  "iconName": "git-pull-request",
+  "categories": ["Continuous integration"],
+  "filePatterns": ["package*.json$", "\\.github/.*\\.ya?ml$"]
+}

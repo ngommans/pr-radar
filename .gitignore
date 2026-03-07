@@ -1,5 +1,6 @@
 node_modules/
-dist/
+packages/cli/dist/
+packages/core/dist/
 build/
 out/
 .next/
@@ -10,4 +11,3 @@ coverage/
 Thumbs.db
 .env
 .env.local
-packages/action/dist/licenses.txt
