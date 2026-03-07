@@ -1,7 +1,6 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { throttling } from '@octokit/plugin-throttling';
-import { Octokit } from '@octokit/core';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
@@ -9,10 +8,22 @@ import { detectCollisions } from 'pr-radar-core/detector';
 import { upsertComment, deleteComment, findManagedComment, buildCollisionComment, buildClearComment } from 'pr-radar-core/comment';
 import { getAllOpenPRsWithFiles, upsertCheckRun, postCommitStatus } from 'pr-radar-core/github-api';
 
-const ThrottledOctokit = Octokit.plugin(throttling);
-
 async function run() {
   const token = core.getInput('token', { required: true });
+  // github.getOctokit returns @octokit/rest with paginate, rest, etc. already included.
+  // We wrap it with throttling by passing the plugin via additionalPlugins.
+  const octokit = github.getOctokit(token, {
+    throttle: {
+      onRateLimit: (retryAfter, options, _octokit, retryCount) => {
+        core.warning(`PR Radar: rate limit hit. Retry after ${retryAfter}s (attempt ${retryCount + 1})`);
+        return retryCount < 3;
+      },
+      onSecondaryRateLimit: (retryAfter, options) => {
+        core.warning(`PR Radar: secondary rate limit hit on ${options.method} ${options.url}`);
+        return false;
+      },
+    },
+  }, throttling);
   const ignorePatterns = parseCommaSeparated(core.getInput('ignore-patterns'));
   const autoIgnore = parseCommaSeparated(core.getInput('auto-ignore'));
   const paths = parseCommaSeparated(core.getInput('paths'));
@@ -29,34 +40,15 @@ async function run() {
     return;
   }
 
-  const octokit = new ThrottledOctokit({
-    auth: token,
-    throttle: {
-      onRateLimit: (retryAfter, options, octokit, retryCount) => {
-        const remaining = options.request?.response?.headers?.['x-ratelimit-remaining'];
-        core.warning(`PR Radar: rate limit hit — x-ratelimit-remaining: ${remaining ?? 'unknown'}. Retry after ${retryAfter}s (attempt ${retryCount + 1})`);
-        return retryCount < 3;
-      },
-      onSecondaryRateLimit: (retryAfter, options) => {
-        core.warning(`PR Radar: secondary rate limit hit on ${options.method} ${options.url}`);
-        return false;
-      },
-    },
-  });
-
+  // Wrap octokit.paginate to count calls and emit rate-limit warnings
   let apiCallCount = 0;
-  const originalRequest = octokit.request.bind(octokit);
-  octokit.request = async (...args) => {
+  const originalPaginate = octokit.paginate.bind(octokit);
+  octokit.paginate = async (...args) => {
     apiCallCount++;
     if (apiCallCount === 500) {
-      core.warning(`PR Radar: ~500 API calls made in this run. Consider using path scoping (paths input) or additional ignore-patterns to reduce API usage.`);
+      core.warning('PR Radar: ~500 API calls made in this run. Consider using path scoping (paths input) or additional ignore-patterns to reduce API usage.');
     }
-    const result = await originalRequest(...args);
-    const remaining = result?.headers?.['x-ratelimit-remaining'];
-    if (remaining !== undefined && parseInt(remaining, 10) <= 100) {
-      core.warning(`PR Radar: x-ratelimit-remaining is ${remaining}. Results may be partial if quota is exhausted.`);
-    }
-    return result;
+    return originalPaginate(...args);
   };
 
   // Load and merge ignore patterns
