@@ -1,0 +1,35 @@
+{
+  "name": "pr-radar",
+  "version": "0.1.0",
+  "description": "Detect file-level collisions across open pull requests — local CLI",
+  "type": "module",
+  "bin": {
+    "pr-radar": "./bin/pr-radar.js"
+  },
+  "scripts": {
+    "test": "echo \"CLI tests: run manually with 'node bin/pr-radar.js --help'\""
+  },
+  "keywords": [
+    "pull-request",
+    "collision",
+    "merge-conflict",
+    "cli",
+    "git"
+  ],
+  "author": "DayCopilot Ltd",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ngommans/pr-radar.git",
+    "directory": "packages/cli"
+  },
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "execa": "^8.0.1",
+    "pr-radar-core": "*",
+    "yargs": "^17.7.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

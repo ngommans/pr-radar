@@ -1,0 +1,112 @@
+name: PR Radar (self-test)
+
+# PR Radar runs on its own PRs — eating its own cooking.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  pull-requests: write
+  checks: write
+  contents: read
+
+jobs:
+  # Run unit tests on every PR
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
+
+  # Run PR Radar on its own PRs
+  collision-check:
+    name: PR Radar — Collision Check
+    runs-on: ubuntu-latest
+    # Only run on non-closed events (closed is handled by the clear job below)
+    if: github.event.action != 'closed'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build action
+        run: npm run build --workspace=packages/action --if-present
+
+      # Run the action from local path (self-hosted)
+      - name: PR Radar
+        uses: ./packages/action
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ignore-patterns: "package-lock.json,yarn.lock,*.snap"
+          auto-ignore: "gitignore"
+
+  # On PR close, re-evaluate all open PRs to clear stale warnings
+  collision-clear:
+    name: PR Radar — Clear on Close
+    runs-on: ubuntu-latest
+    if: github.event.action == 'closed'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build action
+        run: npm run build --workspace=packages/action --if-present
+
+      - name: PR Radar (re-evaluate after close)
+        uses: ./packages/action
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ignore-patterns: "package-lock.json,yarn.lock,*.snap"
+          auto-ignore: "gitignore"
+
+  # Test the CLI on Windows to verify cross-platform compatibility
+  cli-windows:
+    name: CLI — Windows Compatibility
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Test CLI help output
+        run: node packages/cli/bin/pr-radar.js --help
+        shell: pwsh
+
+      - name: Test CLI against HEAD (self-comparison)
+        run: node packages/cli/bin/pr-radar.js main HEAD --format json
+        shell: pwsh
+        continue-on-error: true  # May fail if main doesn't exist in shallow clone

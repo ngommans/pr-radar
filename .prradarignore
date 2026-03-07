@@ -1,0 +1,32 @@
+# PR Radar ignore file
+# Same minimatch glob syntax as .gitignore
+# Files matching these patterns are excluded from collision detection.
+#
+# This file is auto-discovered by both the GitHub Action and the CLI.
+# Add project-specific patterns here to reduce false positives.
+
+# Lock files — nearly always false positives in collision detection
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+npm-shrinkwrap.json
+
+# Build output and generated files
+dist/
+build/
+out/
+.next/
+.nuxt/
+coverage/
+*.generated.ts
+*.generated.js
+*.snap
+
+# IDE and OS files
+.DS_Store
+Thumbs.db
+*.suo
+*.user
+
+# GitHub Action compiled output (managed by ncc build)
+packages/action/dist/
