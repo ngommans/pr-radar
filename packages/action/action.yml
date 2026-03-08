@@ -1,6 +1,6 @@
 name: PR Radar
 description: Detect file-level collisions across open pull requests
-author: DayCopilot Ltd
+author: ngommans
 
 inputs:
   token:
