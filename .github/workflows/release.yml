@@ -65,13 +65,3 @@ jobs:
         run: npm publish --workspace=packages/cli --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Create GitHub Release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG: ${{ github.ref_name }}
-        run: |
-          gh release create "${TAG}" \
-            --title "${TAG}" \
-            --generate-notes \
-            --verify-tag
