@@ -47,8 +47,14 @@ jobs:
           if ! git diff --cached --quiet; then
             git commit -m "chore: add compiled dist for ${TAG}"
             git tag -f "${TAG}"
-            git push --force-with-lease origin "${TAG}"
+            git push --force origin "${TAG}"
           fi
+
+          # Update the floating major-version tag (e.g. v0.0.1 -> v0)
+          # This is what users pin when they write uses: ngommans/pr-radar@v1
+          MAJOR_TAG="v$(echo "${TAG}" | cut -d. -f1 | tr -d 'v')"
+          git tag -f "${MAJOR_TAG}"
+          git push --force origin "${MAJOR_TAG}"
 
       - name: Publish pr-radar-core to npm
         run: npm publish --workspace=packages/core --access public
