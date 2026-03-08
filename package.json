@@ -1,6 +1,6 @@
 {
   "name": "pr-radar-root",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "description": "Monorepo root for PR Radar — detect file-level collisions across open pull requests",
   "workspaces": [
